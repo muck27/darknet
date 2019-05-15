@@ -1,12 +1,13 @@
 #include "route_layer.h"
-#include "dark_cuda.h"
+#include "cuda.h"
 #include "blas.h"
+
 #include <stdio.h>
 
 route_layer make_route_layer(int batch, int n, int *input_layers, int *input_sizes)
 {
     fprintf(stderr,"route ");
-    route_layer l = { (LAYER_TYPE)0 };
+    route_layer l = {0};
     l.type = ROUTE;
     l.batch = batch;
     l.n = n;
@@ -21,8 +22,8 @@ route_layer make_route_layer(int batch, int n, int *input_layers, int *input_siz
     fprintf(stderr, "\n");
     l.outputs = outputs;
     l.inputs = outputs;
-    l.delta = (float*)calloc(outputs * batch, sizeof(float));
-    l.output = (float*)calloc(outputs * batch, sizeof(float));
+    l.delta =  calloc(outputs*batch, sizeof(float));
+    l.output = calloc(outputs*batch, sizeof(float));;
 
     l.forward = forward_route_layer;
     l.backward = backward_route_layer;
@@ -58,8 +59,8 @@ void resize_route_layer(route_layer *l, network *net)
         }
     }
     l->inputs = l->outputs;
-    l->delta = (float*)realloc(l->delta, l->outputs * l->batch * sizeof(float));
-    l->output = (float*)realloc(l->output, l->outputs * l->batch * sizeof(float));
+    l->delta =  realloc(l->delta, l->outputs*l->batch*sizeof(float));
+    l->output = realloc(l->output, l->outputs*l->batch*sizeof(float));
 
 #ifdef GPU
     cuda_free(l->output_gpu);
@@ -67,16 +68,16 @@ void resize_route_layer(route_layer *l, network *net)
     l->output_gpu  = cuda_make_array(l->output, l->outputs*l->batch);
     l->delta_gpu   = cuda_make_array(l->delta,  l->outputs*l->batch);
 #endif
-
+    
 }
 
-void forward_route_layer(const route_layer l, network_state state)
+void forward_route_layer(const route_layer l, network net)
 {
     int i, j;
     int offset = 0;
     for(i = 0; i < l.n; ++i){
         int index = l.input_layers[i];
-        float *input = state.net.layers[index].output;
+        float *input = net.layers[index].output;
         int input_size = l.input_sizes[i];
         for(j = 0; j < l.batch; ++j){
             copy_cpu(input_size, input + j*input_size, 1, l.output + offset + j*l.outputs, 1);
@@ -85,13 +86,13 @@ void forward_route_layer(const route_layer l, network_state state)
     }
 }
 
-void backward_route_layer(const route_layer l, network_state state)
+void backward_route_layer(const route_layer l, network net)
 {
     int i, j;
     int offset = 0;
     for(i = 0; i < l.n; ++i){
         int index = l.input_layers[i];
-        float *delta = state.net.layers[index].delta;
+        float *delta = net.layers[index].delta;
         int input_size = l.input_sizes[i];
         for(j = 0; j < l.batch; ++j){
             axpy_cpu(input_size, 1, l.delta + offset + j*l.outputs, 1, delta + j*input_size, 1);
@@ -101,32 +102,31 @@ void backward_route_layer(const route_layer l, network_state state)
 }
 
 #ifdef GPU
-void forward_route_layer_gpu(const route_layer l, network_state state)
+void forward_route_layer_gpu(const route_layer l, network net)
 {
     int i, j;
     int offset = 0;
     for(i = 0; i < l.n; ++i){
         int index = l.input_layers[i];
-        float *input = state.net.layers[index].output_gpu;
+        float *input = net.layers[index].output_gpu;
         int input_size = l.input_sizes[i];
         for(j = 0; j < l.batch; ++j){
-            //copy_ongpu(input_size, input + j*input_size, 1, l.output_gpu + offset + j*l.outputs, 1);
-            simple_copy_ongpu(input_size, input + j*input_size, l.output_gpu + offset + j*l.outputs);
+            copy_gpu(input_size, input + j*input_size, 1, l.output_gpu + offset + j*l.outputs, 1);
         }
         offset += input_size;
     }
 }
 
-void backward_route_layer_gpu(const route_layer l, network_state state)
+void backward_route_layer_gpu(const route_layer l, network net)
 {
     int i, j;
     int offset = 0;
     for(i = 0; i < l.n; ++i){
         int index = l.input_layers[i];
-        float *delta = state.net.layers[index].delta_gpu;
+        float *delta = net.layers[index].delta_gpu;
         int input_size = l.input_sizes[i];
         for(j = 0; j < l.batch; ++j){
-            axpy_ongpu(input_size, 1, l.delta_gpu + offset + j*l.outputs, 1, delta + j*input_size, 1);
+            axpy_gpu(input_size, 1, l.delta_gpu + offset + j*l.outputs, 1, delta + j*input_size, 1);
         }
         offset += input_size;
     }

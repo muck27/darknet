@@ -1,0 +1,17 @@
+/clyde/content/trial/darknet_recv/data/data/camera_2/out3_00000001139010701.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_2/out3_00000001139011201.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_2/out3_00000001139011101.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_2/out3_00000001139010801.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_2/out3_00000001139011001.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_2/out3_00000001139010901.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_3/out3_00000001139011301.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_3/out3_00000001139011801.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_3/out3_00000001139011701.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_3/out3_00000001139011601.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_3/out3_00000001139011501.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_3/out3_00000001139011401.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_1/out3_00000001139010301.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_1/out3_00000001139010601.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_1/out3_00000001139010501.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_1/out3_00000001139010401.jpg
+/clyde/content/trial/darknet_recv/data/data/camera_1/out3_00000001139010201.jpg
